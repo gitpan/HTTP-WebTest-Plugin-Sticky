@@ -9,11 +9,11 @@ HTTP::WebTest::Plugin::Sticky - Propagate hidden and text form fields
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -33,6 +33,10 @@ This plugin for the HTTP::WebTest module let you post a form that
 includes all the inputs from the page, including hidden ones. 
 
 Also you can add new inputs using the "params" hash.
+
+In case of inputs of type "checkbox", they are included only if
+they have the "checked" property. In other case, you must set it
+on purpose using the normal "params" hash.
 
 =head1 TEST PARAMETERS
     
@@ -85,6 +89,9 @@ sub prepare_request {
         next unless defined $name;
         my $value = $token->[1]{value};
         next unless defined $value;
+
+        next if (lc($type) eq 'checkbox') and  not defined($token->[1]{checked});
+
         $inputs{$name} = $value;
     }
     if(defined $params) {
